@@ -1,7 +1,12 @@
 const { Pool } = require("pg");
 
+// Configure database connection
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString:
+    process.env.NODE_ENV === "production"
+      ? process.env.DATABASE_URL
+      : "postgresql://postgres:WaheguruJi@localhost:5432/train_reservation", // Local database URL
+  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false, // SSL for production
 });
 
 // Fetch all seats sorted by seat_id
@@ -18,7 +23,7 @@ const resetSeats = async () => {
 
 // Book consecutive seats, handling across rows if necessary
 const bookSeats = async (seatIds) => {
-  if (!Array.isArray(seatIds) || seatIds.some(id => isNaN(id))) {
+  if (!Array.isArray(seatIds) || seatIds.some((id) => isNaN(id))) {
     throw new Error("Invalid seatIds format. Must be an array of numbers.");
   }
 
@@ -54,7 +59,9 @@ const bookSeats = async (seatIds) => {
 
       // Booking remaining seats from available rows sequentially
       for (let seatId of seatsToBook) {
-        const nextAvailableSeat = allSeats.find(seat => seat.booked === false); // Find the next available seat
+        const nextAvailableSeat = allSeats.find(
+          (seat) => seat.booked === false
+        ); // Find the next available seat
         if (nextAvailableSeat) {
           const result = await client.query(
             "UPDATE seats SET booked = true WHERE seat_id = $1 AND booked = false RETURNING *",
