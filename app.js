@@ -5,11 +5,20 @@ const bookingRoutes = require("./routes/bookingRoutes");
 const cors = require("cors");
 
 const app = express();
-
+const allowedOrigins = [
+  'http://localhost:3001', // Local frontend
+  'https://frontend-two-sigma-69.vercel.app', // Deployed frontend
+];
 // Enable CORS with the allowed origin
 app.use(cors({
-  origin: 'https://frontend-pi-three-16.vercel.app/',
-  methods: ['GET', 'POST'],
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
 }));
 
 app.use(bodyParser.json());
