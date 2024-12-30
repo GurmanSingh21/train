@@ -8,7 +8,7 @@ const app = express();
 
 // Enable CORS with the allowed origin
 app.use(cors({
-  origin: 'https://your-frontend-url.com',
+  origin: 'https://frontend-pi-three-16.vercel.app/',
   methods: ['GET', 'POST'],
 }));
 
