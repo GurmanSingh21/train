@@ -3,6 +3,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const bookingRoutes = require("./routes/bookingRoutes");
 const cors = require("cors");
+const pool = require("./config/db");
 
 const app = express();
 const allowedOrigins = [
@@ -22,6 +23,15 @@ app.use(cors({
 }));
 
 app.use(bodyParser.json());
+
+app.get("/test-db", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT NOW()"); // Test query
+    res.status(200).json({ success: true, time: result.rows[0].now });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
 
 // Main Route
 app.use("/api/bookings", bookingRoutes);
